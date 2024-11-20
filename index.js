@@ -1,94 +1,153 @@
+let iconCart = document.querySelector('.icon-cart');
+let closeCart = document.querySelector('.close');
+let body = document.querySelector('body');
+let listProductHtml = document.querySelector('.list-product');
+let listCartHtml = document.querySelector('.list-cart');
+let iconCartSpan = document.querySelector('.icon-cart span');
 
-    let carrito = [];
 
-    let ingreso = prompt(`Hola!! ingresa tu nombre de usuario`).toLocaleLowerCase();
+let listProducts = [];
+let carts = [];
 
-    while (ingreso == '') {
-        alert('No ingresaste un usuario correcto');
-        ingreso = prompt(`Hola!! ingresa tu nombre de usuario`).toLocaleLowerCase();
+iconCart.addEventListener('click', ()=> {
+    body.classList.toggle('show-cart')
+})
+
+closeCart.addEventListener('click', ()=> {
+    body.classList.toggle('show-cart')
+})
+
+const addDataToHtml = () =>{
+    listProductHtml.innerHTML = '';
+    if(listProducts.length > 0){
+        listProducts.forEach(product => {
+            let newProduct = document.createElement('div');
+            newProduct.classList.add('item');
+            newProduct.dataset.id = product.id;
+            newProduct.innerHTML = `
+                    <img src="${product.image}" alt="" srcset="">
+                    <h2>${product.name}</h2>
+                    <div class="price">${product.price}</div>
+                    <button class="add-cart">AGREGAR</button>`;
+            listProductHtml.appendChild(newProduct);
+        })
     }
+}
 
-    alert(`${ingreso}, bienvenido a la tienda de bicicletas PRK`);
+listProductHtml.addEventListener('click', (event) => {
+    let positionClick = event.target;
+    if(positionClick.classList.contains('add-cart')){
+        let product_id = positionClick.parentElement.dataset.id;
+        addToCart(product_id);
+    }
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Tu producto se agrego correctamente 😊",
+        showConfirmButton: false,
+        timer: 1500
+      });
+})
 
-    function mostrarModelos(velocidad) {
-        let modelos = [];
-        let precios = {};
+const addToCart = (product_id) => {
+    let positionProduct = carts.findIndex((value) => value.product_id == product_id)
+    if(carts.length <= 0 ){
+        carts = [{
+            product_id: product_id,
+            quantity: 1
+        }]
+    }else if(positionProduct < 0){
+        carts.push({
+            product_id: product_id,
+            quantity: 1
+        });
+    }else{
+        carts[positionProduct].quantity = carts[positionProduct].quantity + 1;
+    }
+    addCartToHtml();
+    addCartToMemory();
+}
 
-        if (velocidad === 'v24') {
-            modelos = ['mountain bike cosmos', 'mountain bike andromeda', 'mountain bike helium'];
-            precios = {
-                'mountain bike cosmos': 500,
-                'mountain bike andromeda': 600,
-                'mountain bike helium': 550
-            };
-        } else if (velocidad === 'v21') {
-            modelos = ['mountain bike ember', 'mountain bike storm', 'mountain bike blaze'];
-            precios = {
-                'mountain bike ember': 450,
-                'mountain bike storm': 470,
-                'mountain bike blaze': 480
-            };
-        } else {
-            alert('No es un tipo de velocidad válido.');
-            return; 
+const addCartToMemory = ()=> {
+    localStorage.setItem('cart', JSON.stringify(carts));
+}
+
+const addCartToHtml = ()=> {
+    listCartHtml.innerHTML = '';
+    let totalQuantity = 0;
+    if(carts.length > 0){
+        carts.forEach(cart => {
+            totalQuantity = totalQuantity + cart.quantity;
+            let newCart = document.createElement('div');
+            newCart.classList.add('item');
+            newCart.dataset.id = cart.product_id
+            let orderProduct = listProducts.findIndex((value)=> value.id == cart.product_id);
+            let info = listProducts[orderProduct];
+            newCart.innerHTML = `
+            <div class="image">
+                <img src="${info.image}" alt="" srcset="">
+            </div>
+            <div class="name">
+                ${info.name}
+            </div>
+            <div class="total-price">
+                ${info.price * cart.quantity}
+            </div>
+            <div class="quantity">
+                <span class="menos"> < </span>
+                <span>${cart.quantity}</span>
+                <span class="mas"> > </span>
+            </div>`;
+            listCartHtml.appendChild(newCart);
+        }) 
+    }
+    iconCartSpan.innerText = totalQuantity;
+}
+
+listCartHtml.addEventListener('click', (event)=> {
+    let positionClick = event.target;
+    if(positionClick.classList.contains('menos') || positionClick.classList.contains('mas')){
+        let product_id = positionClick.parentElement.parentElement.dataset.id;
+        let type = 'menos';
+        if(positionClick.classList.contains('mas')){
+            type = 'mas';
         }
+        changeQuantity(product_id, type);
+    }
+})
 
-        let modeloElegido = prompt(`Nuestros modelos de ${velocidad} son:\n${modelos.join('\n')}\nElige tu modelo:`);
-
-        if (modeloElegido === null) {
-            alert('uwu la operación fue cancelada.');
-            return; 
-        }
-
-        modeloElegido = modeloElegido.toLowerCase();
-
-        if (modelos.includes(modeloElegido)) {
-            let precio = precios[modeloElegido];
-            
-            carrito.push({ modelo: modeloElegido, precio: precio });
-            alert(`Se agrego al carrito el modelo: ${modeloElegido.charAt(0).toUpperCase() + modeloElegido.slice(1)}\nPrecio: $${precio}`);
-
-            mostrarCarrito();
-        } else {
-            alert('No seleccionaste un modelo correcto.');
+const changeQuantity = (product_id, type) => {
+    let positionItemcart = carts.findIndex((value)=> value.product_id == product_id);
+    if(positionItemcart >= 0){
+        switch(type) {
+            case 'mas':
+                carts[positionItemcart].quantity = carts[positionItemcart].quantity + 1;
+                break;
+            default:
+                let valueChange = carts[positionItemcart].quantity - 1;
+                if(valueChange > 0){
+                    carts[positionItemcart].quantity = valueChange;
+                }else{
+                    carts.splice(positionItemcart, 1);
+                }
+                break;
         }
     }
+    addCartToMemory();
+    addCartToHtml();
+}
 
-    function mostrarCarrito() {
-        if (carrito.length === 0) {
-            alert("El carrito está vacío.");
-        } else {
-            let mensajeCarrito = "Productos en tu carrito:\n";
-            let total = 0;
+const initApp = () => {
+    fetch('products.json')
+    .then(response => response.json())
+    .then(data => {
+        listProducts = data;
+        addDataToHtml();
 
-            carrito.forEach((producto, i) => {
-                mensajeCarrito += `${i + 1}. ${producto.modelo.charAt(0).toUpperCase() + producto.modelo.slice(1)} - $${producto.precio}\n`;
-                total += producto.precio;
-            });
-
-            mensajeCarrito += `\nTotal a pagar: $${total}`;
-            alert(mensajeCarrito);
+        if(localStorage.getItem('cart')){
+            carts = JSON.parse(localStorage.getItem('cart'));
+            addCartToHtml();
         }
-    }
-
-    let velocidad = prompt(`Elige tu tipo de velocidad\n v24 \n v21`);
-
-    while (velocidad !== null) {  
-        if (velocidad === 'v24' || velocidad === 'v21') {
-            mostrarModelos(velocidad);  
-        } else {
-            alert('No es un tipo de velocidad válido');
-        }
-
-        velocidad = prompt(`Elige tu tipo de velocidad\n v24 \n v21 o presiona cancelar para salir`);
-    }
-
-    if (carrito.length > 0) {
-        alert('Gracias por tus compras en la tienda de bicicletas PRK.');
-        mostrarCarrito();
-    } else {
-        alert('Gracias por visitar la tienda de bicicletas PRK.');
-    }
-
-
-
+    })
+}
+initApp();
