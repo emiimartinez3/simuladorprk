@@ -5,7 +5,6 @@ let listProductHtml = document.querySelector('.list-product');
 let listCartHtml = document.querySelector('.list-cart');
 let iconCartSpan = document.querySelector('.icon-cart span');
 
-
 let listProducts = [];
 let carts = [];
 
@@ -150,4 +149,5 @@ const initApp = () => {
         }
     })
 }
+
 initApp();

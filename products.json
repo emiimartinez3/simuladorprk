@@ -2,43 +2,43 @@
     {
         "id": 1,
         "name": "Andromeda",
-        "price": 3500,
+        "price": 350000,
         "image":"./img/Mountain-Andromeda.webp"
     },
     {
         "id": 2,
         "name": "Blaze",
-        "price": 1500,
+        "price": 375000,
         "image":"./img/Mountain-Blaze.webp"
     }, 
     {
         "id": 3,
         "name": "Cosmos",
-        "price": 3500,
+        "price": 375000,
         "image":"./img/Mountain-Cosmos.webp"
     },
     {
         "id": 4,
         "name": "Helium",
-        "price": 3700,
+        "price": 450000,
         "image":"./img/Mountain-Helium.webp"
     },
     {
         "id": 5,
         "name": "Hurricane",
-        "price": 3600,
+        "price": 360000,
         "image":"./img/Mountain-Hurricane.webp"
     },
     {
         "id": 6,
         "name": "Terrain",
-        "price": 3700,
+        "price": 370000,
         "image":"./img/Mountain-Terrain.webp"
     },
     {
         "id": 7,
         "name": "Venom",
-        "price": 4000,
+        "price": 400000,
         "image":"./img/Mountain-Venom.webp"
     }
 ]
